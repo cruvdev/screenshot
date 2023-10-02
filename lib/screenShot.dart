@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:external_path/external_path.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 
@@ -12,7 +12,8 @@ class ShowScreenshots extends StatefulWidget {
 
 class _ShowScreenshotsState extends State<ShowScreenshots> {
   List<File> listImagePath = [];
-  var _permissionStatus;
+  var _permissionStatus1;
+  var _permissionStatus2;
 
   @override
   void initState() {
@@ -21,25 +22,31 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
   }
 
   Future<void> _listenForPermissionStatus() async {
-    final status = await Permission.storage.status;
+    final status1 = await Permission.photos.status;
+    final status2 = await Permission.storage.status;
     setState(() {
-      _permissionStatus = status;
+      _permissionStatus1 = status1;
+      _permissionStatus2 = status2;
     });
   }
 
   Future<void> _requestPermission() async {
-    final status = await Permission.storage.request();
+    final status1 = await Permission.photos.request();
+    final status2 = await Permission.storage.request();
+
     setState(() {
-      _permissionStatus = status;
+      _permissionStatus1 = status1;
+      _permissionStatus2 = status2;
     });
   }
 
   Future<void> _loadScreenshots() async {
-    if (_permissionStatus != PermissionStatus.granted) {
+    if (_permissionStatus1 != PermissionStatus.granted ||
+        _permissionStatus2 != PermissionStatus.granted) {
       await _requestPermission();
     }
 
-    final path = '/storage/emulated/0/DCIM/Screenshots';
+    const path = '/storage/emulated/0/DCIM/Screenshots';
     final Directory directory = Directory(path);
     final List<FileSystemEntity> entities = await directory.list().toList();
     final List<File> imageFiles = entities.whereType<File>().toList();
