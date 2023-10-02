@@ -38,18 +38,27 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
     if (_permissionStatus != PermissionStatus.granted) {
       await _requestPermission();
     }
-    final path = await ExternalPath.getExternalStoragePublicDirectory(
-        ExternalPath.DIRECTORY_SCREENSHOTS);
 
+    final path = '/storage/emulated/0/DCIM/Screenshots';
     final Directory directory = Directory(path);
-    print(directory);
     final List<FileSystemEntity> entities = await directory.list().toList();
-    print(entities);
     final List<File> imageFiles = entities.whereType<File>().toList();
-    print(imageFiles);
-    setState(() {
-      listImagePath = imageFiles.take(10).toList();
-    });
+
+    if (imageFiles.isEmpty) {
+      final fallbackPath = '/storage/emulated/0/Pictures/Screenshots';
+      final fallbackDirectory = Directory(fallbackPath);
+      final List<FileSystemEntity> fallbackEntities =
+          await fallbackDirectory.list().toList();
+      final List<File> fallbackImageFiles =
+          fallbackEntities.whereType<File>().toList();
+      setState(() {
+        listImagePath = fallbackImageFiles.take(10).toList();
+      });
+    } else {
+      setState(() {
+        listImagePath = imageFiles.take(10).toList();
+      });
+    }
   }
 
   @override
