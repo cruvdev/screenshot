@@ -41,29 +41,40 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
   }
 
   Future<void> _loadScreenshots() async {
-    if (_permissionStatus1 != PermissionStatus.granted ||
-        _permissionStatus2 != PermissionStatus.granted) {
-      await _requestPermission();
-    }
+    try {
+      if (_permissionStatus1 != PermissionStatus.granted ||
+          _permissionStatus2 != PermissionStatus.granted) {
+        await _requestPermission();
+      }
 
-    const path = '/storage/emulated/0/DCIM/Screenshots';
-    final Directory directory = Directory(path);
-    final List<FileSystemEntity> entities = await directory.list().toList();
-    final List<File> imageFiles = entities.whereType<File>().toList();
+      final path = '/storage/emulated/0/DCIM/Screenshots';
+      final Directory directory = Directory(path);
+      final List<FileSystemEntity> entities = await directory.list().toList();
+      final List<File> imageFiles = entities.whereType<File>().toList();
 
-    if (imageFiles.isEmpty) {
+      if (imageFiles.isEmpty) {
+        throw Exception('No images found in the first directory.');
+      }
+
+      setState(() {
+        listImagePath = imageFiles.take(10).toList();
+      });
+    } catch (e) {
+      print('Error accessing the first directory: $e');
+
       final fallbackPath = '/storage/emulated/0/Pictures/Screenshots';
       final fallbackDirectory = Directory(fallbackPath);
       final List<FileSystemEntity> fallbackEntities =
           await fallbackDirectory.list().toList();
       final List<File> fallbackImageFiles =
           fallbackEntities.whereType<File>().toList();
+
+      if (fallbackImageFiles.isEmpty) {
+        throw Exception('No images found in the fallback directory.');
+      }
+
       setState(() {
         listImagePath = fallbackImageFiles.take(10).toList();
-      });
-    } else {
-      setState(() {
-        listImagePath = imageFiles.take(10).toList();
       });
     }
   }
