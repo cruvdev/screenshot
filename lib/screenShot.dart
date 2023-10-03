@@ -47,7 +47,7 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
         await _requestPermission();
       }
 
-      final path = '/storage/emulated/0/DCIM/Screenshots';
+      final path = '/storage/emulated/0/Pictures/Screenshots';
       final Directory directory = Directory(path);
       final List<FileSystemEntity> entities = await directory.list().toList();
       final List<File> imageFiles = entities.whereType<File>().toList();
@@ -62,7 +62,7 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
     } catch (e) {
       print('Error accessing the first directory: $e');
 
-      final fallbackPath = '/storage/emulated/0/Pictures/Screenshots';
+      final fallbackPath = '/storage/emulated/0/DCIM/Screenshots';
       final fallbackDirectory = Directory(fallbackPath);
       final List<FileSystemEntity> fallbackEntities =
           await fallbackDirectory.list().toList();
