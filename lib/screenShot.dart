@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:media_gallery2/media_gallery2.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 
 class ShowScreenshots extends StatefulWidget {
@@ -12,13 +13,84 @@ class ShowScreenshots extends StatefulWidget {
 
 class _ShowScreenshotsState extends State<ShowScreenshots> {
   List<File> listImagePath = [];
+  List<Media> allMedias = [];
+  late final List collection1;
+  late Directory externalStorageDirs;
   var _permissionStatus1;
   var _permissionStatus2;
+  // List<Files> _selectedFiles = [];
 
   @override
   void initState() {
     super.initState();
+    collectio();
     _listenForPermissionStatus();
+  }
+
+  Future<void> collectio() async {
+    collection1 = await MediaGallery.listMediaCollections(
+      mediaTypes: [MediaType.image, MediaType.video],
+    );
+  }
+
+  Future<void> fetchAndSortMedia() async {
+    try {
+      // Replace 'collection' with the actual MediaCollection you want to use
+      MediaCollection collection = collection1.first;
+
+      final MediaPage imagePage = await collection.getMedias(
+        mediaType: MediaType.image,
+        take: 10,
+      );
+      final MediaPage videoPage = await collection.getMedias(
+        mediaType: MediaType.video,
+        take: 10,
+      );
+
+      final List<Media> images = [
+        ...imagePage.items,
+        // ...videoPage.items,
+      ]..sort((x, y) => y.creationDate.compareTo(x.creationDate));
+
+      setState(() {
+        allMedias = images;
+      });
+
+      // Now you have a sorted list of media items in 'allMedias'
+      for (var media in allMedias) {
+        print('Media Name: ${media.id}');
+        print('Media Type: ${media.mediaType}');
+        print('Creation Date: ${media.creationDate}');
+        // You can access other properties of 'media' as needed
+      }
+    } catch (e) {
+      print('Error fetching and sorting media: $e');
+    }
+  }
+
+  Future<void> pickImages() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.media,
+        allowMultiple: true, // Allow picking multiple images
+      );
+
+      if (result != null) {
+        List<File> pickedFiles =
+            result.paths.map((path) => File(path!)).toList();
+
+        // Handle the picked image files (e.g., display, upload, or process them)
+        for (File file in pickedFiles) {
+          print("Picked image: ${file.path}");
+        }
+      } else {
+        // User canceled the file picking
+        print("User canceled the file picking.");
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during file picking
+      print("Error picking images: $e");
+    }
   }
 
   Future<void> _listenForPermissionStatus() async {
@@ -47,35 +119,30 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
         await _requestPermission();
       }
 
-      final path = '/storage/emulated/0/Pictures/Screenshots';
+      final path = Platform.isAndroid
+          ? '/storage/emulated/0/Pictures/Screenshots'
+          : Platform.isIOS
+              ? 'private/var/mobile/Containers/Data/Application/ECC6F249-E763-494C-BEE7-4D4011ED747F/tmp/'
+              : null;
+
+      if (path == null) {
+        throw Exception('Unsupported platform');
+      }
+
       final Directory directory = Directory(path);
+
       final List<FileSystemEntity> entities = await directory.list().toList();
       final List<File> imageFiles = entities.whereType<File>().toList();
 
       if (imageFiles.isEmpty) {
-        throw Exception('No images found in the first directory.');
+        throw Exception('No images found in the directory.');
       }
 
       setState(() {
         listImagePath = imageFiles.take(10).toList();
       });
     } catch (e) {
-      print('Error accessing the first directory: $e');
-
-      final fallbackPath = '/storage/emulated/0/DCIM/Screenshots';
-      final fallbackDirectory = Directory(fallbackPath);
-      final List<FileSystemEntity> fallbackEntities =
-          await fallbackDirectory.list().toList();
-      final List<File> fallbackImageFiles =
-          fallbackEntities.whereType<File>().toList();
-
-      if (fallbackImageFiles.isEmpty) {
-        throw Exception('No images found in the fallback directory.');
-      }
-
-      setState(() {
-        listImagePath = fallbackImageFiles.take(10).toList();
-      });
+      print('Error accessing the directory: $e');
     }
   }
 
@@ -89,7 +156,11 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
         children: [
           ElevatedButton(
             onPressed: () {
-              _loadScreenshots();
+              if (Platform.isAndroid) {
+                _loadScreenshots();
+              } else {
+                fetchAndSortMedia();
+              }
             },
             child: const Text('Load Screenshots'),
           ),
@@ -100,10 +171,22 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
                 crossAxisSpacing: 8.0,
                 mainAxisSpacing: 8.0,
               ),
-              itemCount: listImagePath.length,
+              itemCount:
+                  Platform.isAndroid ? listImagePath.length : allMedias.length,
               itemBuilder: (context, index) {
-                final File file = listImagePath[index];
-                return Image.file(file, fit: BoxFit.cover);
+                if (Platform.isIOS) {
+                  final media = allMedias[index];
+                  return FadeInImage(
+                    fit: BoxFit.cover,
+                    placeholder: MemoryImage(kTransparentImageBytes),
+                    image: MediaImageProvider(
+                      media: media,
+                    ),
+                  );
+                } else {
+                  final File file = listImagePath[index];
+                  return Image.file(file, fit: BoxFit.cover);
+                }
               },
             ),
           ),
