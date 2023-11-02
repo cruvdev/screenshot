@@ -39,6 +39,9 @@ dependencies:
   permission_handler: ^11.0.0
   media_gallery2: ^0.1.12
   transparent_image: ^2.0.1
+  external_path: ^1.0.3
+  lecle_downloads_path_provider: ^0.0.2+8
+
 
 dev_dependencies:
   flutter_test:

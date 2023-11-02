@@ -34,9 +34,9 @@ PODS:
     - DKImagePickerController/PhotoGallery
     - Flutter
   - Flutter (1.0.0)
-  - media_gallery2 (0.0.1):
+  - lecle_downloads_path_provider (0.0.1):
     - Flutter
-  - permission_handler_apple (9.1.1):
+  - media_gallery2 (0.0.1):
     - Flutter
   - SDWebImage (5.18.2):
     - SDWebImage/Core (= 5.18.2)
@@ -46,8 +46,8 @@ PODS:
 DEPENDENCIES:
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
+  - lecle_downloads_path_provider (from `.symlinks/plugins/lecle_downloads_path_provider/ios`)
   - media_gallery2 (from `.symlinks/plugins/media_gallery2/ios`)
-  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
 
 SPEC REPOS:
   trunk:
@@ -61,18 +61,18 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
     :path: Flutter
+  lecle_downloads_path_provider:
+    :path: ".symlinks/plugins/lecle_downloads_path_provider/ios"
   media_gallery2:
     :path: ".symlinks/plugins/media_gallery2/ios"
-  permission_handler_apple:
-    :path: ".symlinks/plugins/permission_handler_apple/ios"
 
 SPEC CHECKSUMS:
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   file_picker: ce3938a0df3cc1ef404671531facef740d03f920
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  lecle_downloads_path_provider: b24e71004ad61a26c7e4422373627acdb01d9251
   media_gallery2: ad22d20a964307b3126f48657db3a5d9a5cda64a
-  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   SDWebImage: c0de394d7cf7f9838aed1fd6bb6037654a4572e4
   SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
 

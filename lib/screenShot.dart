@@ -1,8 +1,11 @@
+import 'dart:io';
+
+import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
+import 'package:lecle_downloads_path_provider/lecle_downloads_path_provider.dart';
 import 'package:media_gallery2/media_gallery2.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_picker/file_picker.dart';
-import 'dart:io';
 
 class ShowScreenshots extends StatefulWidget {
   const ShowScreenshots({super.key});
@@ -93,6 +96,13 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
     }
   }
 
+  Future<void> givePath() async {
+    // Directory? downloadsDirectory = await DownloadsPath.downloadsDirectory();
+    String? downloadsDirectoryPath =
+        (await DownloadsPath.downloadsDirectory())?.path;
+    print(downloadsDirectoryPath);
+  }
+
   Future<void> _listenForPermissionStatus() async {
     final status1 = await Permission.photos.status;
     final status2 = await Permission.storage.status;
@@ -122,7 +132,7 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
       final path = Platform.isAndroid
           ? '/storage/emulated/0/Pictures/Screenshots'
           : Platform.isIOS
-              ? 'private/var/mobile/Containers/Data/Application/ECC6F249-E763-494C-BEE7-4D4011ED747F/tmp/'
+              ? ''
               : null;
 
       if (path == null) {
@@ -160,6 +170,7 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
                 _loadScreenshots();
               } else {
                 fetchAndSortMedia();
+                givePath();
               }
             },
             child: const Text('Load Screenshots'),
