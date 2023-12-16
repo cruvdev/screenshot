@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
 import 'package:lecle_downloads_path_provider/lecle_downloads_path_provider.dart';
 import 'package:media_gallery2/media_gallery2.dart';
@@ -45,14 +44,9 @@ class _ShowScreenshotsState extends State<ShowScreenshots> {
         mediaType: MediaType.image,
         take: 10,
       );
-      final MediaPage videoPage = await collection.getMedias(
-        mediaType: MediaType.video,
-        take: 10,
-      );
 
       final List<Media> images = [
         ...imagePage.items,
-        // ...videoPage.items,
       ]..sort((x, y) => y.creationDate.compareTo(x.creationDate));
 
       setState(() {
